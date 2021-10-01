@@ -1,5 +1,8 @@
 # History
 
+## 0.5.2 (2021-TBD)
+* Update session cookies after fetching cached responses with cookies
+
 ## 0.5.1 (2021-09-10)
 * Fix issue with request params duplicated from request URL
 
