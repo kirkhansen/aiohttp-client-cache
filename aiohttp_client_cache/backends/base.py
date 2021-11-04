@@ -56,6 +56,7 @@ class CacheBackend:
             filter_fn: function that takes a :py:class:`aiohttp.ClientResponse` object and
                 returns a boolean indicating whether or not that response should be cached. Will be
                 applied to both new and previously cached responses
+            stale_if_error: Return stale cache data if a new request raises an exception
         """
         self.name = cache_name
         self.expire_after = expire_after
