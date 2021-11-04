@@ -39,6 +39,7 @@ class CacheBackend:
         ignored_params: Iterable = None,
         cache_control: bool = False,
         filter_fn: Callable = lambda r: True,
+        stale_if_error: bool = False,
         **kwargs,
     ):
         """
@@ -64,6 +65,7 @@ class CacheBackend:
         self.cache_control = cache_control
         self.filter_fn = filter_fn
         self.disabled = False
+        self.stale_if_error = stale_if_error
 
         # Allows multiple redirects or other aliased URLs to point to the same cached response
         self.redirects: BaseCache = DictCache()
@@ -132,9 +134,12 @@ class CacheBackend:
 
         if not response:
             logger.debug('No cached response found')
+        # Return a cached object in case of other errors, if specified
+        elif getattr(response, 'is_expired', False) and self.stale_if_error:
+            return response  # type: ignore
         # If the item is expired or filtered out, delete it from the cache
         elif not self.is_cacheable(response):  # type: ignore
-            logger.debug('Cached response expired; deleting')
+            logger.debug('Cached response not cacheable; deleting')
             response = None
             await self.delete(key)
         else:
