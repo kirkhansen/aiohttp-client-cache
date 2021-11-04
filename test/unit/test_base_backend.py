@@ -227,3 +227,13 @@ async def test_is_cacheable(method, status, disabled, expired, filter_return, ex
     cache.filter_fn = lambda x: filter_return
     cache.disabled = disabled
     assert cache.is_cacheable(mock_response) is expected_result
+
+
+async def test_stale_if_error():
+    cache = CacheBackend(stale_if_error=True)
+    mock_response = get_mock_response(is_expired=True)
+    await cache.responses.write('request-key', mock_response)
+
+    response = await cache.get_response('request-key')
+    assert response == mock_response
+    assert response.is_expired is True
